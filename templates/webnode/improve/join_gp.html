@@ -1,0 +1,40 @@
+{% extends 'webnode/improve/base.html' %}
+{% load i18n static auth_tokens %}
+{% block meta %}
+    {{ block.super }}
+    {% include 'webnode/snippets/home_seo.html' %}
+{% endblock %}
+{% block page_title %}<title>{{ service.project_name }} - {% trans "Join GimiPOWA" %}</title>{% endblock %}
+
+{% block head_style %}
+    {{ block.super }}
+    <style>
+        body {background: #f6f6f6}
+
+        @media (min-width: 768px) {
+            .gimipowa-img {background-image: url("{% static 'kakocase/img/tchopetyamo/personalisez.jpg' %}"); background-size: cover;  height: 700px;}
+            .join-now {margin-top: 500px; position: absolute; padding: 15px 50px; right: 280px}
+        }
+    </style>
+{% endblock %}
+
+{% block page_content %}
+    <div class="container-fluid">
+        <div class="row">
+            <div class="gimipowa-img">
+                <a href="{% url 'join_gp_now' %}" class="btn btn-danger join-now">Join GimiPOWA</a>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {{ block.super }}
+    <script type="text/javascript">
+        (function() {
+        })()
+    </script>
+
+
+{% endblock %}
