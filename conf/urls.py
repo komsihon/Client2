@@ -7,11 +7,9 @@ from django.contrib.auth.decorators import permission_required, user_passes_test
 from ikwen.accesscontrol.utils import is_staff
 from ikwen.core.views import Offline
 
-from ikwen_kakocase.shopping.views import FlatPageView
+from ikwen_kakocase.shopping.views import FlatPageView, Home
 from ikwen_kakocase.kakocase.views import Welcome, AdminHome
 from ikwen_kakocase.trade.provider.views import ProviderDashboard, CCMDashboard
-
-from ikwen_webnode.webnode.views import Home
 
 from yamo.views import save_ghost_user
 
