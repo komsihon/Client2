@@ -27,7 +27,6 @@ urlpatterns = patterns(
     url(r'^billing/', include('ikwen.billing.urls', namespace='billing')),
     url(r'^marketing/', include('ikwen_kakocase.commarketing.urls', namespace='marketing')),
     url(r'^sales/', include('ikwen_kakocase.sales.urls', namespace='sales')),
-    url(r'^shopping/', include('ikwen_kakocase.shopping.urls', namespace='shopping')),
 
     url(r'^i18n/', include('django.conf.urls.i18n')),
     url(r'^currencies/', include('currencies.urls')),
@@ -53,8 +52,14 @@ urlpatterns = patterns(
     url(r'^welcome/$', Welcome.as_view(), name='welcome'),
 
     url(r'^home/', include('ikwen_webnode.webnode.urls', namespace='webnode')),
-    url(r'^$', Home.as_view(), name='home'),
+    # url(r'^$', Home.as_view(), name='home'),
+    # url(r'^shopping/', include('ikwen_kakocase.shopping.urls', namespace='shopping')),
+    url(r'^', include('ikwen_kakocase.shopping.urls', namespace='shopping')),
+
     url(r'^offline.html$', Offline.as_view(), name='offline'),
     url(r'^save_ghost_user$', save_ghost_user, name='save_ghost_user'),
+
+    #Foulassi URLs
+    url(r'^foulassi/', include('ikwen_foulassi.foulassi.urls', namespace='foulassi')),
 )
 
