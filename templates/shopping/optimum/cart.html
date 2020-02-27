@@ -29,6 +29,7 @@
     <div id="content" class="checkout-content">
         <h2 class="checkout-header">{% trans "My Shopping Bag" %}</h2>
         <div class="container" style="overflow: hidden; padding: 2em 0">
+            {% for msg in messages %}<p class="alert alert-danger">{{ msg|safe }}</p>{% endfor %}
             {% if coupon_list and user.is_authenticated%}
                 <div id="coupons" class="card-ul" style="">
                     <div class="card">
