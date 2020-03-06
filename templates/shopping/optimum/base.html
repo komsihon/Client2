@@ -29,7 +29,18 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,400italic,300" rel="stylesheet">
             {% endif %}
 		{% endblock %}
-            <link href="{% static 'tchopetyamo/css/yamo.css' %}" rel="stylesheet">
+        <link href="{% static 'tchopetyamo/css/yamo.css' %}" rel="stylesheet">
+        <link rel="manifest" href="/manifest.json">
+        <script>
+        if ('serviceWorker' in navigator) {
+          window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/service-worker.js')
+                .then((reg) => {
+                  console.log('Service worker registered.', reg);
+                });
+          });
+        }
+        </script>
         {% block head_js %}
             <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
             <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -402,6 +413,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         {% endif %}
         <div class="edge-swipe-overlay"></div>
 
+        <script src="{% static 'ikwen/js/install-pwa.js' %}"></script>
         <script src="{% static 'kakocase/js/bootstrap-3.1.1.min.js' %}"></script>
         <script src="{% static 'kakocase/js/simpleCart.min.js' %}"></script>
         <script src="{% static 'kakocase/swiper/js/swiper.min.js' %}"></script>
@@ -751,7 +763,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
             })()
 		</script>
         <script>
-            var mySwiper = new Swiper ('.xs-swiper-container', {
+            let mySwiper = new Swiper ('.xs-swiper-container', {
                 // Optional parameters
                 direction: 'horizontal',
                 loop: false,
@@ -759,11 +771,9 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 slidePosition: 0,
                 freeMode: true,
                 centeredSlides: true,
-    {#            cssWidthAndHeight: false,#}
                 slidesPerView: 'auto',
             })
-
-    </script>
+        </script>
         {% block js %}{% endblock %}
     </body>
 </html>
