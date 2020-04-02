@@ -40,28 +40,10 @@
                         </div>
                     </div>
 
-                    <div class="cart box_1">
-                        <a href="{% url 'shopping:cart' %}" style="float: left"><i class="kkc-cart fa fa-opencart fa-4x"></i></a>
-                        <div style="float: left; margin: 10px">
-                            <a href="{% url 'shopping:cart' %}">
-                                <h5>
-                                    <div class="total">
-                                        <span class="simpleCart_total"></span>
-                                        <span class="label label-danger simpleCart_quantity">{% trans "" context 'cart items' %}</span>
-                                    </div>
-                                </h5>
-                            </a>
-                            <a href="javascript:;" class="empty-cart" data-toggle="modal"
-                               data-target="#confirm-empty-cart">
-                                <span style="font-weight: 300">{% trans "Empty Cart" %}</span>
-                            </a>
-                        </div>
-                        <div class="clearfix"> </div>
-                    </div>
                 </div>
                 <div class="divider"></div>
                     <ul class="nav nav-pills nav-stacked">
-                        <li><a href="{% url 'shopping:home' %}">{% trans 'Order now' %}</a></li>
+                        <li><a href="{% url 'shopping:home' %}">{% trans 'Home' %}</a></li>
                         <li><a href="{% url 'blog:home' %}">Blog</a></li>
                         {% if agreement_page %}
                             <li><a href="{% url 'flatpage' agreement_page.url %}">{{ agreement_page.title }}</a></li>

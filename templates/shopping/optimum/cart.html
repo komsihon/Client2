@@ -26,7 +26,9 @@
 {% endblock %}
 
 {% block content %}
+    {% with symbol=CURRENCY.symbol checkout_min=config.checkout_min|currency:CURRENCY.code|floatformat:CURRENCY.precision|intcomma %}
     <div id="content" class="checkout-content">
+        <div id="checkout-min" class="hidden">{{ config.checkout_min }}</div>
         <h2 class="checkout-header">{% trans "My Shopping Bag" %}</h2>
         <div class="container" style="overflow: hidden; padding: 2em 0">
             {% for msg in messages %}<p class="alert alert-danger">{{ msg|safe }}</p>{% endfor %}
@@ -72,8 +74,8 @@
             {% if order %}
                 {% include 'shopping/snippets/checkout_confirmation.html' %}
             {% else %}
-                <p class="alert alert-danger min-checkout" style="display: none">
-                    {% blocktrans with symbol=CURRENCY.symbol checkout_min=config.checkout_min|currency:CURRENCY.code|floatformat:CURRENCY.precision|intcomma %}
+                <p class="alert alert-danger min-checkout hide">
+                    {% blocktrans %}
                     Dear customer, please reach a minimum of <strong>{{ symbol }} {{ checkout_min }}</strong> to checkout.{% endblocktrans%}</p>
             {% endif %}
             <div class="row">
@@ -82,7 +84,6 @@
                         {% if order %}
                             {% include 'shopping/snippets/cart_products_confirmed.html' %}
                         {% endif %}
-
                          <div class="cart-item subtle-shade tpl">
                              <div class="close1"> </div>
                              <div class="cart-sec simpleCart_shelfItem">
@@ -104,7 +105,7 @@
                                              <h3>{% trans "Price" %}</h3>
                                          </div>
                                          <div class="col-xs-7 col-sm-7 col-md-7 col-lg-4">
-                                             <h3>{% trans "Quantity" %}</h3>
+                                             <h3 class="title-quantity">{% trans "Quantity" %}</h3>
                                          </div>
                                          <div class=" col-lg-4 visible-lg">
                                              <h3>{% trans "Subtotal" %}</h3>
@@ -203,31 +204,8 @@
             </div>
         </div>
     </div>
-    <div class="modal fade" id="suggest-login" tabindex="-1" role="dialog">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content modal-info">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                </div>
-                <div class="modal-body">
-                    <div class="alert alert-info cashflex" style="display: none">
-                    {% blocktrans %}
-                        <strong>CashFlex</strong> payment allows you to pay with money in your bank
-                        account or by getting a loan from your bank. Thus, you must absolutely login
-                        for us to authenticate your information.
-                    {% endblocktrans %}
-                    </div>
-                    <div>{% url 'shopping:checkout' as checkout_url %}
-                    {% blocktrans %}
-                        <a href="#" class="btn btn-success connect">Login</a> to proceed. You can still
-                        <a href="#" class="register">register</a> if you don't have an account with us.
-                    {% endblocktrans %}
-                    </div>
-                    <div class="clearfix"></div>
-                </div>
-            </div>
-        </div>
-    </div>
+    {% include 'shopping/snippets/modal_suggest_login.html' %}
+    {% url 'shopping:checkout' as checkout_url %}
     <form id="start-checkout" action="{% if user.is_authenticated %}{{ checkout_url }}{% endif %}">
         <input type="hidden" id="next" name="next">
         <input type="hidden" id="anonymous-buyer-id" name="anonymous_buyer_id">
@@ -235,6 +213,7 @@
         <input type="hidden" id="buy-packing" name="buy_packing">
         <input type="hidden" id="coupon-id" name="coupon_id">
     </form>
+    {% endwith %}
 {% endblock %}
 {% block js %}
     {{ block.super }}
@@ -251,7 +230,7 @@
                 {% endif %}
             {% else %}
                 var currency = simpleCart.currency().symbol,
-                    minCheckout = $('#checkout-min').text(),
+                    minCheckout = parseFloat($('#checkout-min').text()),
                     itemsPackingQty = 0,
                     deliveryPackingCost = {{ max_delivery_packing_cost }},
                     itemsPackingCost = 0,
@@ -420,8 +399,9 @@
                         if (promoRate > 0) $('#promo-code').remove()
                     });
                     if (itemsCost < minCheckout) {
-                        $('.alert.min-checkout').show();
+                        $('.alert.min-checkout').removeClass('hide');
                     }
+                    else $('.alert.min-checkout').addClass('hide');
                 }
                 {% if user.is_anonymous %}
                     var anonymousBuyerId = localStorage.getItem('anonymousBuyerId');
@@ -460,7 +440,7 @@
                         paymentMeanSlug = $(this).data('slug'),
                         isCashFlex = $(this).data('is_cashflex');
                     if (!deliveryOptionId) {
-                        alert("{% trans "Please choose a delivery option." %}");
+                        $('#warning-delivery-location').modal('show');
                         return false;
                     }
                     if (isCashFlex) {
@@ -541,6 +521,8 @@
                     $('#coupon-id').val(couponId)
                 }
             })
+
+            $('.cart-shopping').addClass('hide');
         })()
     </script>
 {% endblock %}

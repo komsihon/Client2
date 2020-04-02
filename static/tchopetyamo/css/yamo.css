@@ -18,7 +18,7 @@
 .social-icon i:hover {color: #a40009}
 .social-icon a:first-child {margin-left: 0}
 
-.nav-xs .swiper-slide{background: #a40009;}
+/*.nav-xs .swiper-slide{background: #a40009;}*/
 
 .product-tile {margin-left: 0;}
 /*BLOG STYLE*/
@@ -72,6 +72,8 @@ section.home-section .description {line-height: 35px;font-size: 21px;}
 #footer a:hover {color: #a40009;}
 .slide .details .cta {margin-top: 75px; border: none;background-color: transparent}
 .slide .details .button1 {background-color: #a40009; border: 2px solid #a40009; color: #fff; font-size: 24px; padding: 8px 30px}
+
+.cart-shopping .icon{ background-color: #5f0000; }
 
 @media (max-width: 768px) {
     .edge-panel-left .logo {margin-top: 20px; padding: 0}
