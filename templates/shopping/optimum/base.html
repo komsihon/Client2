@@ -18,7 +18,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
             <link rel="stylesheet" href="{% static 'kakocase/css/bootstrap.css' %}" />
             <link rel="stylesheet" href="{% static 'kakocase/css/font-awesome/css/font-awesome.min.css' %}" />
             <link rel="stylesheet" href="{% static 'kakocase/swiper/css/swiper.min.css' %}">
-            <link rel="stylesheet" href="{% static 'kakocase/css/optimum.css' %}?v=04.02.20.21.03" type="text/css" media="all" />
+            <link rel="stylesheet" href="{% static 'kakocase/css/optimum.css' %}?V=20.08.03.10.10" type="text/css" media="all" />
             {% if config.theme %}
                 {% with theme=config.theme %}
                     <link rel='stylesheet' href="{% static 'kakocase/themes/' %}{{ theme.template.slug }}/{{ theme.slug }}.css?v=03.27.20" />
@@ -147,7 +147,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
     {#                                                    (<span id="simpleCart_quantity" class="simpleCart_quantity"></span> {% trans "items" context 'cart items' %})#}
                                                     </div>
 
-                                                    <span class="label label-danger simpleCart_quantity">{% trans "" context 'cart items' %}</span>
+                                                    <span class="label label-danger animated simpleCart_quantity">{% trans "" context 'cart items' %}</span>
                                                 </h5>
                                             </a>
                                             <a href="javascript:;" class="empty-cart" data-toggle="modal"
@@ -292,6 +292,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     </div>
                 </div>
             </div>
+            {% block horizontal_menu %}
             <div class="visible-xs" style="height: 155px">
                 <div class="nav-xs appear animated">
                     <!-- Additional required wrapper -->
@@ -361,11 +362,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     </div>
                 </div>
             </div>
+            {% endblock horizontal_menu %}
             {% endcache %}
         {% endblock %}
         {% block banner %}{% endblock %}
         {% block content %}{% endblock %}
 
+        {% block cart_shopping %}
         <div class="cart-shopping animated hide subtle-shade text-center" data-color="light" style="height: 55px">
             <div class="icon">
                 <span class="label label-danger simpleCart_quantity"></span>
@@ -378,6 +381,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 <div class="v-align-center" style="flex: auto"> {% trans "Checkout" %}</div>
             </a>
         </div>
+        {% endblock cart_shopping %}
 
         {% block footer %}
             {% cache template_cache_duration footer %}
@@ -529,7 +533,11 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 });
                 simpleCart.bind('afterAdd', function (item) {
                     $('div#added-to-cart .name').text(item.get('name'));
-                    var size = item.get('size');
+                    $('span.label-danger.animated').addClass('bounce');
+                    setTimeout(function () {
+                        $('span.label-danger.animated').removeClass('bounce')
+                    }, 600);
+                    let size = item.get('size');
                     if (size !== '-------')
                         $('div#added-to-cart .size').text('(' + size + ')');
                     else
@@ -583,7 +591,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     $('.cart-shopping.animated').toggleClass('fadeInUp fadeOutDown')
                 });
                 $('#content').on('click', '.product-tile button.my-cart-b:not(.sold-out)', function () {
-                    var id = $(this).data('id'),
+                    let id = $(this).data('id'),
                         image = $(this).data('image'),
                         name = $(this).data('name'),
                         description = $(this).data('description'),
@@ -657,7 +665,10 @@ License URL: http://creativecommons.org/licenses/by/3.0/
 
                 //Check simpleCart_items : BEGIN
                 simpleCart.load();
-                if (simpleCart.quantity() > 0) $('.cart-shopping.animated:not(.fadeInUp)').removeClass('hide fadeOutDown').addClass('fadeInUp')
+                if (simpleCart.quantity() > 0) {
+                    $('.cart-shopping.animated:not(.fadeInUp)').removeClass('hide fadeOutDown').addClass('fadeInUp');
+                    $('.simpleCart_quantity').text(simpleCart.quantity())
+                }
                 //Check simpleCart_items : END
 
 
