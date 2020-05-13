@@ -461,9 +461,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         {% include 'shopping/snippets/modal_added_to_cart.html' %}
         {% include 'shopping/snippets/modal_successful_registration.html' %}
         {% include 'shopping/snippets/modal_delivery_location_warning.html' %}
-        {% if not user.is_authenticated %}
-        {% include 'shopping/snippets/modal_news_letter.html' %}
-        {% endif %}
         <div class="edge-swipe-overlay"></div>
 
         <script src="{% static 'ikwen/js/install-pwa.js' %}"></script>
@@ -732,39 +729,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         }
                     }));
                 });
-                $('#news-letter  button.save').click(function () {
-                    var email = $('input#email').val()
-                    if (!isValidEmail(email)) return
-
-                    var endpoint = "{% url 'save_ghost_user' %}";
-                    var params = {email: email};
-                    $('body, button.confirm').css('cursor','wait');
-                    $.getJSON(endpoint, params, function(data) {
-                        $('body, button.confirm').css('cursor','default');
-                        if (data.error) {
-                            $('div#top-notice-ctnr span').html(data.error).addClass('failure');
-                            $('#top-notice-ctnr').fadeIn().delay(5000).fadeOut();
-                            $('input#email').focus()
-                            localStorage.setItem('showEmailModal', true)
-                        } else {
-                            localStorage.setItem('showEmailModal', false)
-                            $('#news-letter').modal('hide');
-                            $('div#top-notice-ctnr span').html(data.response).addClass('failure');
-                            $('#top-notice-ctnr').fadeIn().delay(5000).fadeOut();
-                        }
-                    });
-                });
-            function isValidEmail(email) {
-                var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-                return re.test(String(email).toLowerCase());
-            }
-                if (("{{ is_in_newsletter }}") === 'False') {
-                    if(!localStorage.getItem('showEmailModal')){
-                        setTimeout(function() {
-                            $('#news-letter').modal();
-                        }, 4000);
-                    }
-                }
                 if ($(window).width() < 992) {
                     $('.edge-panel-left').addClass('has-shade').appendTo('.edge-swipe-overlay')
                 }
