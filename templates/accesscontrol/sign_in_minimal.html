@@ -4,7 +4,7 @@
 {% block page_title %}<title>{{ service.project_name }} - {% trans "Sign in" %} </title>{% endblock %}
 {% block head_style %}
     {{ block.super }}
-    <link rel='stylesheet' href="{% static 'ikwen/css/sign-in.css' %}" />
+    <link rel='stylesheet' href="{% static 'ikwen/css/sign-in.css' %}?v=20.5.18" />
 {% endblock %}
 
 {% block content %}
@@ -275,17 +275,22 @@
                     },
                     success: function(data) {
                         $('#auth .spinner').css('visibility', 'hidden');
-                        $('#content').removeClass('init');
                         if (data.existing) {
+                            $('#auth').prop('action', "{% url 'ikwen:do_sign_in' %}?{{ request.META.QUERY_STRING }}");
+                            if (data.no_password && !data.is_staff) {
+                                $('#password').val('---');  // --- is just a random password not to leave the field blank
+                                $('#submit').click();
+                                return
+                            }
+                            $('#content').removeClass('init');
                             location.hash = 'login';
                             $('#password').focus();
-                            $('#auth').prop('action', "{% url 'ikwen:do_sign_in' %}?{{ request.META.QUERY_STRING }}");
                             if (username.isValidEmail()) {
                                 {% url 'ikwen:forgotten_password' as forgotten_password_url %}
                                 $('.forgotten-pwd').prop('href', '{{ forgotten_password_url }}' + '?' + 'username=' + username);
                             }
                         } else {
-                            $('#content').hide().addClass('register step1').fadeIn('normal', 'linear', function() {
+                            $('#content').hide().removeClass('init').addClass('register step1').fadeIn('normal', 'linear', function() {
                                 $('#password').focus();
                             });
                             $('#stage').removeClass('form-wrapper').addClass('col-sm-9 col-md-8');
