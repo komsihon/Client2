@@ -12,13 +12,17 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1">
         {% block meta %}{% endblock %}
+        {% if config.is_pwa_ready %}
+            <link rel="manifest" href="/manifest.json' %}">
+        {% endif %}
         {% include 'core/snippets/color_and_icons.html' %}
 		{% block page_title %}{% endblock %}
 		{% block head_style %}
             <link rel="stylesheet" href="{% static 'kakocase/css/bootstrap.css' %}" />
             <link rel="stylesheet" href="{% static 'kakocase/css/font-awesome/css/font-awesome.min.css' %}" />
             <link rel="stylesheet" href="{% static 'kakocase/swiper/css/swiper.min.css' %}">
-            <link rel="stylesheet" href="{% static 'kakocase/css/optimum.css' %}?V=20.08.03.10.10" type="text/css" media="all" />
+            <link rel="stylesheet" href="{% static 'kakocase/css/optimum.css' %}?v=20.5.29" type="text/css" media="all" />
+            <link rel="stylesheet" href="{% static 'ikwen/css/pwa.css' %}?v=20.5.29" type="text/css" media="all" />
             {% if config.theme %}
                 {% with theme=config.theme %}
                     <link rel='stylesheet' href="{% static 'kakocase/themes/' %}{{ theme.template.slug }}/{{ theme.slug }}.css?v=03.27.20" />
@@ -29,16 +33,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
             {% endif %}
 		{% endblock %}
         <link href="{% static 'tchopetyamo/css/yamo.css' %}?v=03.31.20" rel="stylesheet">
-        <link rel="manifest" href="/manifest.json">
         <script>
-        if ('serviceWorker' in navigator) {
-          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/service-worker.js')
-                .then((reg) => {
-                  console.log('Service worker registered.', reg);
-                });
-          });
-        }
+            navigator.serviceWorker.getRegistrations().then(
+                function(registrations) {
+                    for(let registration of registrations) {
+                        if (registration.active.scriptURL.indexOf('service-worker.js') > 0) registration.unregister();
+                    }
+            });
         </script>
         {% block head_js %}
             <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -54,6 +55,9 @@ License URL: http://creativecommons.org/licenses/by/3.0/
     <body>
         <div id="top-notice-ctnr" style="display: none">
             <span class="floating-notice has-shade" style="float: none; position: static"> </span>
+        </div>
+        <div class="progress" id="network-manager">
+            <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="20" aria-valuemin="0" aria-valuemax="100" style="width: 20%"></div>
         </div>
         {% block header %}
             {% cache template_cache_duration header user.username %}
@@ -235,16 +239,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         </span>
                     </div>
                     <div class="pull-right v-align" style="margin-right: 6px;">
-
-{#                        <a class="cd-search-trigger" href="#cd-search"> <span></span></a>#}
                         <div class="xs-nav-container">
-{#                            <div class="button-hover-handler">#}
-{#                                <a class="toggle-menu-appearance action" id="toggle-menu-xs-appearance" aria-haspopup="true" aria-expanded="true">#}
-{#                                    <i class="fa fa-th-large"></i>#}
-{#                                </a>#}
-{#                            </div>#}
-
-
                             {% if user.is_authenticated %}
                                 <div class="button-hover-handler">
                                     <a class="action" href="{{ settings.IKWEN_CONSOLE_URL }}">
@@ -461,9 +456,51 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         {% include 'shopping/snippets/modal_added_to_cart.html' %}
         {% include 'shopping/snippets/modal_successful_registration.html' %}
         {% include 'shopping/snippets/modal_delivery_location_warning.html' %}
+        <div id="pwa-overlay">
+            <div class="text-has-shade text-center visible-xs visible-sm">
+                <h3 style="color: #fff; margin: 5vh 0; font-weight: 600">{% trans "Click the button below" %}</h3>
+                <div>
+                    <i class="fa fa-arrow-down" style="font-size: 27px"></i>
+                </div>
+            </div>
+        </div>
         <div class="edge-swipe-overlay"></div>
+        {# modal BEGIN #}
+        <div class="modal fade" id="modal-generic-notice" tabindex="-1" role="dialog">
+            <div class="modal-dialog" role="document">
+                <div class="modal-content modal-info">
+                    <div class="modal-header text-center">
+                        <div class="illustration cover"></div>
+                        <div class="illustration success" style="">
 
-        <script src="{% static 'ikwen/js/install-pwa.js' %}"></script>
+                        </div>
+                        <div class="illustration error">
+                            <img class="img-responsive" src="{% static 'ikwen/img/warning-icon.png' %}" />
+                        </div>
+                        <div class="clearfix"></div>
+                    </div>
+                    <div class="modal-body text-center">
+                        <h4 class="title"></h4>
+                        <p class="message text-muted"></p>
+                        <div class="actions-container">
+                            <div class="actions">
+                                <div class="col-xs-12 col-sm-4 action pull-right">
+                                    <a class="btn btn-lg btn-block btn-deep-blue btn-ok" aria-label="OK">{% trans "OK" %}</a>
+                                </div>
+                                <div class="col-xs-12 col-sm-4 pull-left action pull-left">
+                                    <button data-dismiss="modal" class="btn btn-lg btn-default btn-block btn-cancel">{% trans 'Cancel' %}</button>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {# modal END #}
+        {% if config.is_pwa_ready %}
+            <script src="{% static 'ikwen/js/pwa-main.js' %}"></script>
+        {% endif %}
         <script src="{% static 'kakocase/js/bootstrap-3.1.1.min.js' %}"></script>
         <script src="{% static 'kakocase/js/simpleCart.min.js' %}"></script>
         <script src="{% static 'kakocase/swiper/js/swiper.min.js' %}"></script>
@@ -484,8 +521,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     }
                 }
 
-                {% if request.GET.successfulRegistration %}
-                    $('#modal-successful-registration').modal('show');
+                {% if request.GET.refer_now %}
+                    let img = "{% static 'kakocase/img/refer-friends.svg' %}",
+                    title = "{% blocktrans %}Select and send a product to your follower{% endblocktrans %}",
+                    message = "{% blocktrans %}Browse and choose a product your follower might like and send him the link using a Sharing button.{% endblocktrans %}",
+                    url = "",
+                    okText = "{% trans 'Got it !' %}";
+                    ikwen.showNoticeDialog(img, title, message, url, okText);
                 {% endif %}
 
                 /* CART STUFFS */
@@ -638,27 +680,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     }
                     $('div#product-modal-preview').modal('hide')
                 });
-
-                {% comment %}// Listening scroll direction : BEGIN
-                $('body').bind('mousewheel', function (e) {
-                    if(e.originalEvent.wheelDelta < 0){
-                        $('.nav-xs.animated').addClass('fadeOutUp')
-                    }
-                    else {
-                        $('.nav-xs.animated').removeClass('fadeOutUp').addClass('fadeInDown')
-                    }
-                });
-                //Firefox specifications
-                $('body').bind('DOMMouseScroll', function (e) {
-                    if(e.originalEvent.detail > 0){
-                        $('.nav-xs.animated').addClass('fadeOutUp')
-                    }
-                    else {
-                        $('.nav-xs.animated').removeClass('fadeOutUp').addClass('fadeInDown')
-                    }
-
-                });
-                // Listening scroll direction : END{% endcomment %}
 
                 //Check simpleCart_items : BEGIN
                 simpleCart.load();

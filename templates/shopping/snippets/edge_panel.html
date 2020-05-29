@@ -55,7 +55,6 @@
                             <li><a href="{% url 'ikwen:sign_in' %}">{% trans "Login" %}</a></li>
                         {% endif %}
                     </ul>
-                    <div class="clearfix"></div>
                     <div class="social-icon">
                         {% if config.facebook_link %}
                             <a href="{{ config.facebook_link }}" target="_blank"><i class="fa fa-facebook-official"></i></a>
@@ -66,7 +65,9 @@
                             <a href="{{ config.google_plus_link }}" target="_blank"><i class="fa fa-google-plus-square"></i></a>{% endif %}
                         {% if config.linkedin_link %}<a href="{{ config.linkedin_link }}" target="_blank"><i class="fa fa-linkedin-square"></i></a>{% endif %}
                     </div>
+                    <div class="clearfix"></div>
                 </div>
+                {% include 'core/snippets/pwa_promotion/edge_menu.html' %}
             </div>
         </div>
     </div>
