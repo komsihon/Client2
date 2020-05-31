@@ -3,8 +3,9 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 from django.contrib.auth.decorators import permission_required, user_passes_test
 
-from ikwen.accesscontrol.utils import is_staff
 from ikwen.core.views import Offline
+from ikwen.core.analytics import analytics
+from ikwen.accesscontrol.utils import is_staff, update_push_subscription
 
 from ikwen_kakocase.shopping.views import FlatPageView, Home
 from ikwen_kakocase.kakocase.views import Welcome, AdminHome, FirstTime, GuardPage
@@ -42,6 +43,8 @@ urlpatterns = patterns(
     url(r'^ikwen/cashout/', include('ikwen.cashout.urls', namespace='cashout')),
     url(r'^ikwen/home/$', user_passes_test(is_staff)(AdminHome.as_view()), name='admin_home'),
     url(r'^ikwen/', include('ikwen.core.urls', namespace='ikwen')),
+    url(r'^analytics', analytics),
+    url(r'^update_push_subscription$', update_push_subscription),
 
     url(r'^echo/', include('echo.urls', namespace='echo')),
 
