@@ -7,7 +7,7 @@ from ikwen.accesscontrol.utils import is_staff
 from ikwen.core.views import Offline
 
 from ikwen_kakocase.shopping.views import FlatPageView, Home
-from ikwen_kakocase.kakocase.views import Welcome, AdminHome
+from ikwen_kakocase.kakocase.views import Welcome, AdminHome, FirstTime, GuardPage
 from ikwen_kakocase.trade.provider.views import ProviderDashboard, CCMDashboard
 
 from yamo.views import save_ghost_user
@@ -48,6 +48,9 @@ urlpatterns = patterns(
     # url(r'^$', ProviderDashboard.as_view(), name='admin_home'),
     url(r'^page/(?P<url>[-\w]+)/$', FlatPageView.as_view(), name='flatpage'),
     url(r'^welcome/$', Welcome.as_view(), name='welcome'),
+    url(r'^firstTime/$', FirstTime.as_view(), name='first_time'),
+    url(r'^guardPage/$', GuardPage.as_view(), name='guard_page'),
+
 
     url(r'^home/', include('ikwen_webnode.webnode.urls', namespace='webnode')),
     url(r'^$', Home.as_view(), name='home'),
