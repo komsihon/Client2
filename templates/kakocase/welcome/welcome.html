@@ -1,0 +1,169 @@
+{% extends 'kakocase/welcome/base.html' %}
+{% load i18n static humanize webdesign media_from_provider %}
+
+{% block meta %}
+    <meta name="theme-color" content="#233682">
+    <meta name="msapplication-navbutton-color" content="#233682">
+    <meta name="apple-mobile-web-app-status-bar-style" content="#233682">
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="{{ service.url }}" />
+    <meta property="og:image" itemprop="image" content="{{ settings.IKWEN_MEDIA_URL }}{{ service.config.logo.name }}" />
+    <meta property="og:title" content="{{ config.small_description }}"/>
+    <meta property="og:description" content="{{ config.description }}">
+    <meta property="description" content="{{ config.description }}" />
+    {% if service.is_pwa_ready %}
+        <link rel="manifest" href="/manifest.json' %}">
+    {% endif %}
+{% endblock %}
+
+{% block page_title %}
+    <title>{{ service.project_name }} - Welcome</title>
+{% endblock %}
+
+{% block head_style %}
+    <link rel="shortcut icon" type="image/png" href="{{ settings.IKWEN_MEDIA_URL }}{{ service.config.logo.name }}">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
+    <link rel='stylesheet' href="{% static 'ikwen/css/flatly.bootstrap.min.css' %}" />
+    <link rel='stylesheet' href="{% static 'kakocase/css/welcome/base.css' %}" />
+    <link rel='stylesheet' href="{% static 'ikwen/swiper/css/swiper.min.css' %}" />
+    <link rel="stylesheet" href="{% static 'kakocase/css/welcome/welcome.css' %}?v=20-05-23.19.23"/>
+    <link rel="stylesheet" href="{% static 'ikwen/css/pwa.css' %}"/>
+
+    <!--Conditional custom css -->
+    <link rel="stylesheet" type="text/css" href="{% static 'kakocase/css/welcome/'%}other.css">
+    <link rel="stylesheet" type="text/css" href="{% static 'kakocase/css/welcome/'%}{{ business_category }}.css">
+    <style>
+        #content {margin-bottom: 0!important;}
+        .banner {min-height: 270px}
+        .banner-image img {height: 150px;  display: inline}
+        .banner-title {font-size: 28px; line-height: 32px}
+
+        .cumulated-coupon {margin-top: 30px}
+
+        .section-banniere-bottom {background-image: url({% static 'daraja/img/banner-2.png' %});margin-top: 0!important;}
+
+        @media screen and (max-width: 767px) {
+            .navbar-default .navbar-brand {max-width: 148px;}
+            .navbar-header nav #nav-xs {display: none}
+
+            .banner-title {font-size: 16px;}
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div id="content">
+        <div  class="container" style="padding-top: 0;">
+            <div class="row text-center banner">
+                <div class="banner-image">
+                    <img class="img-responsive" src="{% static 'kakocase/img/welcome/welcome-image.jpg' %}">
+                </div>
+                 <h1 class="banner-title">
+                    {% blocktrans with first_name=request.user.first_name project_name=service.project_name %}
+                        Congratulations {{ first_name }}, welcome to {{ project_name }} !
+                    {% endblocktrans %}
+                </h1>
+                <div class="clearfix"></div>
+            </div>
+            {% if cumulate_coupon_list %}
+            <div class="section row cumulated-coupon">
+                <div class="col-lg-8 col-lg-offset-2 col-sm-10 col-sm-offset-1 description text-center">
+                    <h2>{% trans 'Coupons' %}</h2>
+                    <p>
+                        {% blocktrans %}
+                            Great !!! You totally won <strong>{{ total_cumulated_coupons }}</strong> free coupons.
+                        {% endblocktrans %}
+                    </p>
+                </div>
+                <div class="clearfix"></div>
+
+                <div>
+                    <div class="coupon-group swiper-container">
+                        {% if cumulated_coupon_list|length > 1 %}
+                            <ul class="coupon-list swiper-wrapper">
+                                {% for cumul in cumulated_coupon_list %}
+                                <li class="swiper-slide coupon">
+                                    <img src="{{ settings.IKWEN_MEDIA_URL }}{% if cumul.coupon.image %}{{ cumul.coupon.image.name }}{% else %}{{ config.logo.name }}{% endif %}" />
+                                    <p class="coupon-name text-center">
+                                        {{ cumul.coupon.name }}<br><br> {{ cumul.count }} coupon(s)
+                                    </p>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            <div class="swiper-button-next has-shade">
+                                <i class="fa fa-angle-right"></i>
+                            </div>
+                            <div class="swiper-button-prev has-shade">
+                                <i class="fa fa-angle-left"></i>
+                            </div>
+                        {% else %}
+                            {% with cumul=cumalated_coupon_list|first %}
+                                <img src="{{ settings.IKWEN_MEDIA_URL }}{% if cumul.coupon.image %}{{ cumul.coupon.image.name }}{% else %}{{ config.logo.name }}{% endif %}" />
+                                <p class="coupon-name text-center">
+                                    {{ cumul.coupon.name }}<br><br> {{ cumul.count }} coupon(s)
+                                </p>
+                            {% endwith %}
+                        {% endif %}
+                        <div class="clearfix"></div>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            {% endif %}
+            <div class="push-subscribe activate-notification section row" style="display: none">
+                <div class="col-md-4 col-sm-7 img-illustration">
+                    <img alt="phone notification" class="img-responsive" src="{% static 'kakocase/img/phone-notification.png' %}">
+                </div>
+                <div class="col-md-8 col-sm-5 description">
+                    <h2>{% trans 'Activate notifications' %}</h2>
+                    <p>{% lorem 20 w %}</p>
+                    <div class="action">
+                        <button id="activate" class="btn btn-sm btn-deep-blue push-subscribe-btn" style="{% if config.brand_color and config.brand_color != '#ffffff' and config.brand_color != '#FFFFFF' and config.brand_color != '#fff' and config.brand_color != '#FFF'%} background-color:{{ config.brand_color }}; border-color: {{ config.brand_color }}{% endif %}">
+                            {% include 'core/snippets/button_spinner.html' %}
+                            <span>{% trans "Activate" %}</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+            <div class="install-promotion download-app section row" style="display: none">
+                <div class="col-md-3 col-sm-7 img-illustration">
+                    <img class="img-responsive" src="{% static 'kakocase/img/download-app2.jpg' %}">
+                </div>
+                <div class="col-md-6 col-md-offset-2 col-sm-5 description">
+                    <h2>{% trans 'Download app' %}</h2>
+                    <p>
+                        {% trans 'Install app on your Android device for easy and faster access.s.' %}
+                    </p>
+                    <div class="action">
+                        <button id="download" class="btn btn-sm btn-deep-blue install-pwa" style="{% if config.brand_color and config.brand_color != '#ffffff' and config.brand_color != '#FFFFFF' and config.brand_color != '#fff' and config.brand_color != '#FFF'%} background-color:{{ config.brand_color }}; border-color: {{ config.brand_color }}{% endif %}">
+                            {% include 'core/snippets/button_spinner.html' %}
+                            <span>{% trans "Download" %}</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+        <div>
+            <div class="section-banniere-bottom">
+                <div class="section-banniere-inner">
+                    <div class="col-md-6 col-sm-6 col-md-offset-3 col-sm-offset-3 text-center" style="padding-top: 7vh">
+                        <h1>{% blocktrans with project_name=service.project_name %}Order on {{ project_name }} now{% endblocktrans %}</h1>
+                        <a href="{% url 'ikwen:sign_in' %}?next={% url 'home' %}" class="btn btn-sm btn-outline-white animated pulse"  style="margin-top: 40px; height: 40px">
+                            {% trans "Go !" %}
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block js %}
+    {% if service.is_pwa_ready %}
+        <script src="{% static 'ikwen/js/pwa-main.js' %}"></script>
+    {% endif %}
+    {{ block.super }}
+{% endblock %}
