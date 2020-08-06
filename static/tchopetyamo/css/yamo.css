@@ -17,6 +17,11 @@
 .social-icon i {color: #201338;font-size: 30px;}
 .social-icon i:hover {color: #a40009}
 .social-icon a:first-child {margin-left: 0}
+.install-promotion.banner, .install-promotion.edge-menu {background: #fff0f0; border-color: #fbdede; border-left: none; border-right: none; color: #5f170e}
+.install-promotion.banner .install-pwa, .install-promotion.edge-menu .install-pwa {background: #a40009; border-color: #a40009; font-weight: 700}
+.install-promotion.simple-button {margin-top: 85px; margin-bottom: 2vh}
+a {color: #bd5a61}
+form#auth .cta {font-size: 15px}
 
 /*.nav-xs .swiper-slide{background: #a40009;}*/
 

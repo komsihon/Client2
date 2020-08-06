@@ -5,9 +5,12 @@
 {% block head_style %}
     {{ block.super }}
     <link rel='stylesheet' href="{% static 'ikwen/css/sign-in.css' %}?v=20.5.18" />
+    <link rel='stylesheet' href="{% static 'ikwen/css/pwa.css' %}?v=20.8.6" />
+    <link rel='stylesheet' href="{% static 'tchopetyamo/css/yamo.css' %}?v=20.8.6" />
 {% endblock %}
 
 {% block content %}
+    {% include 'core/snippets/pwa_promotion/simple_button.html' %}
     <div id="content" class="form container init">
         <p class="failure" style="display: none; font-size: 1em; padding: 9px"></p>
         {% if messages %}
@@ -25,18 +28,11 @@
                 <div class="form-group row username">
                     <label for="username" class="col-sm-5 col-md-4">{% trans "E-mail" %}</label>
                     <div class="col-sm-7 col-md-8">
-                        <input id="username" class="form-control input-sm" type="text" name="username" value="{{ username }}" autofocus />
+                        <input id="username" class="form-control" type="text" name="username" value="{{ username }}" autofocus />
                     </div>
                 </div>
                 <div class="form-group submit-username">
-                    {% if settings.IS_UMBRELLA %}
-                        <button class="btn btn-primary btn-block btn-sm" type="button"> {% trans "Submit" %} </button>
-                    {% else %}
-                        <button class="btn btn-primary btn-block btn-sm login-with-ikwen" type="button">
-                            <img height="26" />
-                            {% blocktrans %}Login{% endblocktrans %}
-                        </button>
-                    {% endif %}
+                    <button class="btn btn-primary btn-block" type="button" style="height: 42px; font-size: 15px; font-weight: 700"> {% trans "Submit" %} </button>
                     <div class="spinner">
                         <i class="fa fa-circle-o-notch fa-spin fa-2x"></i>
                     </div>
@@ -79,7 +75,7 @@
                 <div class="form-group row password">
                     <label for="password" class="col-sm-5 col-md-4">{% trans "Password" %}</label>
                     <div class="col-sm-7 col-md-8">
-                        <input id="password" class="form-control input-sm" type="password" name="password" />
+                        <input id="password" class="form-control" type="password" name="password" />
                     </div>
                 </div>
                 <div class="terms">
@@ -126,6 +122,7 @@
 {% endblock %}
 {% block js %}
     {{ block.super }}
+    <script src="{% static 'ikwen/js/pwa-main.js' %}?v=20.5.31"></script>
     <script type="text/javascript">
         {% get_current_language as LANGUAGE_CODE %}
         (function() {
