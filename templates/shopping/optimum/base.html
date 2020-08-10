@@ -21,18 +21,33 @@ License URL: http://creativecommons.org/licenses/by/3.0/
             <link rel="stylesheet" href="{% static 'kakocase/css/bootstrap.css' %}" />
             <link rel="stylesheet" href="{% static 'kakocase/css/font-awesome/css/font-awesome.min.css' %}" />
             <link rel="stylesheet" href="{% static 'kakocase/swiper/css/swiper.min.css' %}">
-            <link rel="stylesheet" href="{% static 'kakocase/css/optimum.css' %}?v=20.8.6.22" type="text/css" media="all" />
-            <link rel="stylesheet" href="{% static 'ikwen/css/pwa.css' %}?v=20.5.29" type="text/css" media="all" />
-            {% if config.theme %}
+            <link rel="stylesheet" href="{% static 'kakocase/css/optimum.css' %}?v=20.08.10" type="text/css" media="all" />
+            <link rel="stylesheet" href="{% static 'ikwen/css/pwa.css' %}?v=20.08.10" type="text/css" media="all" />
+            {% if request.session.theme %}
+                {% with theme=request.session.theme %}
+                    <link rel='stylesheet' href="{% static 'kakocase/themes/' %}{{ theme.template_slug }}/{{ theme.slug }}.css?v=20.08.10" />
+                {% endwith %}
+                <style>
+                    .apply-theme-band {
+                        background-color: rgba(0, 0, 0, 0.6); bottom: 0; color: #FFFFFF; height: 15vh;
+                        padding: 10px 0; position: fixed; width: 100%;
+                    }
+                    .apply-theme-band p {margin-bottom: 10px; text-align: center}
+                    @media (min-width: 768px) {
+                        .apply-theme-band {height: 12vh}
+                        .apply-theme-band p {font-size: 15px; text-align: left}
+                    }
+                </style>
+            {% elif config.theme %}
                 {% with theme=config.theme %}
-                    <link rel='stylesheet' href="{% static 'kakocase/themes/' %}{{ theme.template.slug }}/{{ theme.slug }}.css?v=03.27.20" />
+                    <link rel='stylesheet' href="{% static 'kakocase/themes/' %}{{ theme.template.slug }}/{{ theme.slug }}.css?v=20.08.10" />
                 {% endwith %}
             {% else %}
                 <link href="https://fonts.googleapis.com/css?family=Cagliostro" rel="stylesheet">
                 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,400italic,300" rel="stylesheet">
             {% endif %}
 		{% endblock %}
-        <link href="{% static 'tchopetyamo/css/yamo.css' %}?v=20.8.6" rel="stylesheet">
+        <link href="{% static 'tchopetyamo/css/yamo.css' %}?v=20.08.08" rel="stylesheet">
         <script>
             navigator.serviceWorker.getRegistrations().then(
                 function(registrations) {
@@ -75,11 +90,64 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         <div id="auth" class="top-right">
                             {% if user.is_authenticated %}
                                 <ul>
+                                    <li>
+                                        <div class="push-subscribe activate-notification" style="display: none">
+                                            <button class="fa fa-bell push-subscribe-btn" aria-hidden="true">
+                                                <i class="fa fa-circle"></i>
+                                            </button>
+                                        </div>
+                                    </li>
+                                        {% if config.allow_shopping and config.show_prices %}
+                                        <li class="dropdown">
+                                            <a class="dropdown-toggle" data-toggle="dropdown" id="confirm-checkout" aria-haspopup="true" aria-expanded="true">
+                                                <i class="kkc-cart fa fa-shopping-bag fa-4x"></i>
+                                                <span class="label label-danger simpleCart_quantity" style="margin-left: -4px"></span>
+                                            </a>
+                                            <ul class="user-menu checkout-section dropdown-menu dropdown-menu-right" aria-labelledby="confirm-checkout">
+                                                <li style="width: 100%">
+                                                    <div>
+                                                        <div class="cart-details">
+                                                            <a href="{% url 'shopping:cart' %}">
+                                                                <h4>
+                                                                    <div class="total">
+                                                                        <span class="simpleCart_total"></span>
+                                                                    </div>
+                                                                </h4>
+                                                            </a>
+                                                        </div>
+                                                        <div class="empty-cart pull-right" data-toggle="modal" data-target="#confirm-empty-cart">
+                                                            <i class="fa fa-trash"></i>
+                                                        </div>
+                                                        <div class="clearfix"></div>
+                                                    </div>
+                                                    <div class="clearfix"></div>
+                                                    <a href="{% url 'shopping:cart' %}" class="btn btn-sm btn-block btn-warning">{% trans 'Checkout' %}</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        {% if coupon_summary.threshold_reached %}
+                                        <li>
+                                            <a class="my-coupon-list" href="{% url 'shopping:coupon_list' %}">
+                                                <i class="fa fa-gift"></i><span class="label label-danger">{% if total_coupons > 99 %}99+{% else %}{{ total_coupons }}{% endif %}</span>
+                                            </a>
+                                        </li>
+                                        {% endif %}
+                                    {% endif %}
+                                    <li>
+                                        <a href="{{ settings.IKWEN_CONSOLE_URL }}">
+                                            <i class="fa fa-window-maximize" aria-hidden="true"
+                                               style="line-height: .4em; margin-top: 10px"></i>
+                                            {% if user.get_notice_count > 0 %}
+                                                <span class="label label-danger"
+                                                      style="">{% if user.get_notice_count > 99 %}99+{% else %}{{ user.get_notice_count }}{% endif %}</span>
+                                            {% endif %}
+                                        </a>
+                                    </li>
                                     <li id="user-menu" class="dropdown">
                                         <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                            {{ user.first_name }} <i class="fa fa-user" aria-hidden="true"></i>
+                                            <i class="fa fa-user" aria-hidden="true"></i>
                                         </a>
-                                        <ul class="user-menu dropdown-menu" aria-labelledby="user-menu">
+                                        <ul class="user-menu dropdown-menu dropdown-menu-right" aria-labelledby="user-menu">
                                             <li style="padding: 3px 20px"> {{ user.get_short_name }} </li>
                                             <li role="separator" class="divider" style="margin-bottom: 0; width: 100%"></li>
                                             {% if user.is_staff %}
@@ -97,11 +165,9 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                             {% else %}
                                 <ul class="anonymous">
                                     <li><a href="{% url 'ikwen:sign_in' %}">{% trans "Login" %}</a></li>
-{#                                    <li><a href="{% url 'ikwen:register' %}">{% trans "Create Account" %}</a></li>#}
                                 </ul>
                             {% endif %}
                         </div>
-                        {% include 'shopping/snippets/language_switcher.html' %}
                         {% if config.can_manage_currencies %}
                             {% include 'shopping/snippets/currency_switcher.html' %}
                         {% endif %}
@@ -112,7 +178,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     <div class="container">
                         <div class="logo-nav">
                             <div class="logo-nav-left">
-                                {% url 'webnode:home' as home_url %}
+                                {% url 'shopping:home' as home_url %}
                                 <h1>
                                     <a href="{{ home_url }}" class="hidden-xs">
                                         {% if config.theme.logo.name %}
@@ -122,7 +188,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                         {% else %}
                                            <span>{{ service.project_name }}</span>
                                         {% endif %}
-                                    {% if config.slogan %}<span class="slogan" title="{{ config.slogan }}"><div style="float: left; width: 500%">{{ config.slogan }}</div></span>{% endif %}
+                                    {% if config.slogan %}<div class="slogan" title="{{ config.slogan }}"><span style="float: left; width: 500%">{{ config.slogan }}</span></div>{% endif %}
                                     </a>
                                     <a class="visible-xs">
                                         {% if config.theme.logo.name %}
@@ -130,11 +196,10 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                         {% else %}
                                             <span>{{ service.project_name }}</span>
                                         {% endif %}
-                                    {% if config.slogan %}<span class="slogan" title="{{ config.slogan }}"><div style="float: left; width: 500%">{{ config.slogan }}</div></span>{% endif %}
+                                    {% if config.slogan %}<div class="slogan" title="{{ config.slogan }}"><span style="float: left; width: 500%">{{ config.slogan }}</span></div>{% endif %}
                                     </a>
                                 </h1>
                             </div>
-
                             {% if config.allow_shopping and config.show_prices %}
                                 <div class="header-right2">
                                     <div class="cart box_1">
@@ -142,25 +207,83 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                             <div class="open" style="float: left" title="{% trans 'Open search box' %}"><i class="fa fa-search"></i></div>
                                             <div class="close2" style="float: left" title="{% trans 'Close search box' %}"><i class="fa fa-times"></i></div>
                                         </div>
-                                        <a href="{% url 'shopping:cart' %}"><i class="kkc-cart fa fa-opencart fa-4x"></i></a>
-                                        <div class="cart-details">
-                                            <a href="{% url 'shopping:cart' %}">
-                                                <h5>
-                                                    <div class="total">
-                                                        <span class="simpleCart_total"></span>
-    {#                                                    (<span id="simpleCart_quantity" class="simpleCart_quantity"></span> {% trans "items" context 'cart items' %})#}
-                                                    </div>
-
-                                                    <span class="label label-danger animated simpleCart_quantity">{% trans "" context 'cart items' %}</span>
-                                                </h5>
-                                            </a>
-                                            <a href="javascript:;" class="empty-cart" data-toggle="modal"
-                                               data-target="#confirm-empty-cart">
-                                                <span style="font-weight: 300">{% trans "Empty Cart" %}</span>
-                                            </a>
+                                        <div class="top-right">
+                                            {% if user.is_authenticated %}
+                                                <ul>
+                                                    <li>
+                                                        <div class="push-subscribe activate-notification" style="display: none">
+                                                            <button class="fa fa-bell push-subscribe-btn" aria-hidden="true">
+                                                                <i class="fa fa-circle"></i>
+                                                            </button>
+                                                        </div>
+                                                    </li>
+                                                    <li class="dropdown">
+                                                        <a class="dropdown-toggle" data-toggle="dropdown" id="confirm-checkout" aria-haspopup="true" aria-expanded="true">
+                                                            <i class="kkc-cart fa fa-shopping-bag fa-4x"></i><span class="label label-danger simpleCart_quantity"></span>
+                                                        </a>
+                                                        <ul class="user-menu checkout-section dropdown-menu dropdown-menu-right" aria-labelledby="confirm-checkout">
+                                                            <li style="width: 100%">
+                                                                <div>
+                                                                    <div class="cart-details">
+                                                                        <a href="{% url 'shopping:cart' %}">
+                                                                            <h4>
+                                                                                <div class="total">
+                                                                                    <span class="simpleCart_total"></span>
+                                                                                </div>
+                                                                            </h4>
+                                                                        </a>
+                                                                    </div>
+                                                                    <div class="empty-cart pull-right" data-toggle="modal" data-target="#confirm-empty-cart">
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </div>
+                                                                    <div class="clearfix"></div>
+                                                                </div>
+                                                                <a href="{% url 'shopping:cart' %}" class="btn btn-sm btn-block btn-warning">{% trans 'Checkout' %}</a>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                    {% if coupon_summary.threshold_reached %}
+                                                    <li>
+                                                        <a class="my-coupon-list" href="{% url 'shopping:coupon_list' %}">
+                                                            <i class="fa fa-gift"></i><span class="label label-danger">{% if total_coupons > 99 %}99+{% else %}{{ total_coupons }}{% endif %}</span>
+                                                        </a>
+                                                    </li>
+                                                    {% endif %}
+                                                    <li>
+                                                        <a href="{{ settings.IKWEN_CONSOLE_URL }}">
+                                                            <i class="fa fa-window-maximize" aria-hidden="true"
+                                                               style="line-height: .4em; margin-top: 10px"></i>
+                                                            {% if user.get_notice_count > 0 %}
+                                                                <span class="label label-danger"
+                                                                      style="">{% if user.get_notice_count > 99 %}99+{% else %}{{ user.get_notice_count }}{% endif %}</span>
+                                                            {% endif %}
+                                                        </a>
+                                                    </li>
+                                                    <li id="user-menu" class="dropdown">
+                                                        <a data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                                            <i class="fa fa-user" aria-hidden="true"></i>
+                                                        </a>
+                                                        <ul class="user-menu dropdown-menu dropdown-menu-right" aria-labelledby="user-menu">
+                                                            <li style="padding: 3px 20px"> {{ user.get_short_name }} </li>
+                                                            <li role="separator" class="divider" style="margin-bottom: 0; width: 100%"></li>
+                                                            {% if user.is_staff %}
+                                                                <li>
+                                                                    <a href="{% url 'ikwen:staff_router' %}">Admin</a>
+                                                                </li>
+                                                            {% endif %}
+                                                            <li>{% url "ikwen:account_setup" as account_setup_url %}
+                                                                <a href="{{ account_setup_url|ikwenize }}">{% trans "Account setup" %}</a>
+                                                            </li>
+                                                            <li><a href="{% url "ikwen:logout" %}">{% trans "Logout" %}</a></li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            {% else %}
+                                                <ul class="anonymous">
+                                                    <li><a href="{% url 'ikwen:sign_in' %}">{% trans "Login" %}</a></li>
+                                                </ul>
+                                            {% endif %}
                                         </div>
-
-                                        <div class="clearfix"> </div>
                                     </div>
                                 </div>
                             {% endif %}
@@ -182,35 +305,47 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     </div>
                     <div class="container" style="">
                         <nav class="navbar">
-                            <!-- Brand and toggle get grouped for better mobile display -->
-                            <div class="navbar-header nav_2 visible-xs visible-sm">
-                                <button type="button" class="navbar-toggle collapsed navbar-toggle1" data-toggle="collapse" data-target="#bs-megadropdown-tabs">
-                                    <span class="sr-only">Toggle navigation</span>
-                                    <span class="icon-bar"></span>
-                                    <span class="icon-bar"></span>
-                                    <span class="icon-bar"></span>
-                                </button>
-                            </div>
                             <div class="nav-container">
                                 <ul class="nav navbar-nav">
-                                <li>
-{#                                    <a href="{% url 'shopping:menu' %}">{% trans "Notre carte" %}</a>#}
-                                </li>
-                                {% for menu in menu_list %}
-                                    {% if menu.appear_in_menu %}
-                                        <li class="{{ menu.slug }}">
-                                            {% if menu.content_type == 'FlatPage'  %}
-                                                {% if menu.description %}
-                                                    <a href="{% url 'flatpage' menu.description %}">{% trans menu.title %}</a>
-                                                {% endif %}
-                                            {% elif menu.content_type == 'ItemList' %}
-                                                <a href="{% url 'webnode:item_list' menu.slug %}">{% trans menu.title %}</a>
-                                            {% elif menu.content_type == 'Module' %}
-                                                <a href="{% url menu.module.url_name %}">{% trans menu.title %}</a>
-                                            {% endif %}
+                                    <!-- Mega Menu -->
+                                    {% for smart_category in smart_categories_level2 %}
+                                        <li class="dropdown level2 horizontal">
+                                            <a href="{% url 'shopping:smart_object_detail' smart_category.slug %}">{{ smart_category.title }}</a>
                                         </li>
-                                    {% endif %}
-                                {% endfor %}
+                                    {% endfor %}
+                                    {% for smart_category in smart_categories_level1 %}
+                                        <li class="dropdown horizontal">
+                                            <a href="{% url 'shopping:smart_object_detail' smart_category.slug %}">{{ smart_category.title }}</a>
+                                        </li>
+                                    {% endfor %}
+                                    {% for category in menu_categories %}
+                                        <li class="dropdown horizontal">
+                                            <a href="{% url 'shopping:product_list' category.slug %}">{{ category.name }}</a>
+                                        </li>
+                                    {% endfor %}
+                                    <li class="dropdown categories-menu">
+                                        <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans 'See more ...' %} <span class="fa fa-sort-down pull-right"></span></a>
+                                        <ul class="dropdown-menu categories-menu">
+                                            {% for smart_category in smart_categories_level2 %}
+                                            <li class="dropdown vertical">
+                                                <a href="{% url 'shopping:smart_object_detail' smart_category.slug %}">{{ smart_category.title }}</a>
+                                            </li>
+                                            <li class="divider"></li>
+                                            {% endfor %}
+                                            {% for smart_category in smart_categories_level1 %}
+                                                <li class="dropdown vertical">
+                                                    <a href="{% url 'shopping:smart_object_detail' smart_category.slug %}">{{ smart_category.title }}</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                            {% endfor %}
+                                            {% for category in menu_categories %}
+                                                <li class="dropdown vertical">
+                                                    <a href="{% url 'shopping:product_list' category.slug %}">{{ category.name }}</a>
+                                                </li>
+                                                <li class="divider"></li>
+                                            {% endfor %}
+                                        </ul>
+                                    </li>
                                 </ul>
                             </div>
                         </nav>
@@ -234,30 +369,38 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                             <span class="icon-bar"></span>
                             <span class="icon-bar"></span>
                         </button>
+                        {% if coupon_summary.threshold_reached and not request.COOKIES.hasPendingCoupon %}
+                            <i class="fa fa-circle coupons-notification"></i>
+                        {% endif %}
                         <span class="app-name">
-                            <a>{{ service.project_name }}</a>
+                            <a>{{ service.project_name|truncatechars:":12" }}</a>
                         </span>
                     </div>
                     <div class="pull-right v-align" style="margin-right: 6px;">
                         <div class="xs-nav-container">
                             {% if user.is_authenticated %}
                                 <div class="button-hover-handler">
+                                    <div class="push-subscribe activate-notification" >
+                                        <button class="fa fa-bell push-subscribe-btn" aria-hidden="true">
+                                            <i class="fa fa-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="button-hover-handler console">
                                     <a class="action" href="{{ settings.IKWEN_CONSOLE_URL }}">
                                         {% if user.get_notice_count > 0 %}
                                             <span class="badge badge-danger hidden-xs">{{ user.get_notice_count }}</span>
                                         {% endif %}
-                                        <i class="fa fa-bell"></i>
+                                        <i class="fa fa-window-maximize" style="margin-top: 3px"></i>
                                     </a>
                                 </div>
                                 <div class="action dropdown" style="float: right; width: 20px">
-                                        <a class="dropdown-toggle" data-toggle="dropdown" id="user-menu" aria-haspopup="true" aria-expanded="true">
-                                            <div class="button-hover-handler"><i class="fa fa-user" style=" margin-left: 11px;"></i></div>
-                                        </a>
-
-
+                                    <a class="dropdown-toggle" data-toggle="dropdown" id="user-menu" aria-haspopup="true" aria-expanded="true">
+                                        <div class="button-hover-handler"><i class="fa fa-user" style=" margin-left: 11px;"></i></div>
+                                    </a>
                                     <ul class="user-menu dropdown-menu" aria-labelledby="user-menu" style="left: -120px">
                                         <li style="padding: 3px 20px"> {{ user.get_short_name }} </li>
-                                        <li role="separator" class="divider"></li>
+                                        <li role="separator" class="divider" style="padding: 0"></li>
                                         {% if user.is_staff %}
                                             <li>
                                                 <a href="{% url 'ikwen:staff_router' %}">Admin</a>
@@ -275,7 +418,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                                         <i class="fa fa-user-circle" style="margin-right: 0"></i>
                                     </a>
                                 </div>
-
                             {% endif %}
                         </div>
                     </div>
@@ -288,73 +430,64 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 </div>
             </div>
             {% block horizontal_menu %}
-            <div class="visible-xs" style="height: 155px">
-                <div class="nav-xs appear animated">
-                    <!-- Additional required wrapper -->
-                    <div class="xs-swiper-container">
-                        <ul class="nav swiper-wrapper">
-
-                            {% comment %}<li class="swiper-slide level1">
-                                <a href="{% url 'webnode:home' %}">Home</a>
-                            </li>
-                            <li class="swiper-slide level1">
-                                <a href="{% url 'shopping:home' %}">Order now</a>
-                            </li>{% endcomment %}
-                             {% for smart_category in smart_categories_level2 %}
-                             <li class="swiper-slide level2">
-                             {% if smart_category.image.name != '' %}
-                                 <a href="{% url 'shopping:smart_object_detail' smart_category.slug %}">
-                                     <img src="{% get_media_prefix %}{{ smart_category.image.name }}" class="img-circle has-shade" style=""  alt="">
-                                     <span class="menu-label">{{ smart_category.title | truncatechars:14  }}</span>
-                                 </a>
-                             </li>
-                             {% endif %}
-                             {% endfor %}
-                             {% for smart_category in smart_categories_level1 %}
-                             {% if smart_category.image.name != '' %}
-                             <li class="swiper-slide level1">
-                                 <a href="{% url 'shopping:smart_object_detail' smart_category.slug %}">
-                                     <img src="{% get_media_prefix %}{{ smart_category.image.name }}" class="img-circle has-shade" style=""  alt="">
-                                     <span class="menu-label">{{ smart_category.title | truncatechars:14  }}</span>
-                                 </a>
-                             </li>
-                             {% endif %}
-                             {% endfor %}
-                             {% for category in menu_categories %}
-                             {% if category.image.name != '' %}
-                             <li class="swiper-slide">
-                                 <a href="{% url 'shopping:product_list' category.slug %}">
-                                     <img src="{% get_media_prefix %}{{ category.image.name }}" class="img-circle has-shade" style=""  alt="">
-                                     <span class="menu-label">{{ category.name | truncatechars:14 }}</span>
-                                 </a>
-                             </li>
-                             {% endif %}
-                             {% endfor %}
-                             {% for category in menu_categories %}
-                             {% if category.image.name != '' %}
-                             <li class="swiper-slide">
-                                 <a href="{% url 'shopping:product_list' category.slug %}">
-                                     <img src="{% get_media_prefix %}{{ category.image.name }}" class="img-circle has-shade" style=""  alt="">
-                                     <span class="menu-label">{{ category.name | truncatechars:14 }}</span>
-                                 </a>
-                             </li>
-                             {% endif %}
-                             {% endfor %}
-                             {% for category in quick_access_categories %}
-                             {% if category.image.name != '' %}
-                             <li class="swiper-slide">
-                                 <a href="{% url 'shopping:product_list' category.slug %}">
-                                     <img src="{% get_media_prefix %}{{ category.image.name }}" class="img-circle has-shade" style=""  alt="">
-                                     <span class="menu-label">{{ category.name | truncatechars:14 }}</span>
-                                 </a>
-                             </li>
-                             {% endif %}
-                             {% endfor %}
-                        </ul>
-                    {% if config.can_manage_currencies %}
-                        {% include 'shopping/snippets/currency_switcher.html' %}
-                    {% endif %}
-                    </div>
+            <div class="nav-xs visible-xs appear animated">
+                <!-- Additional required wrapper -->
+                <div class="xs-swiper-container">
+                    <ul class="nav swiper-wrapper">
+                         {% for smart_category in smart_categories_level2 %}
+                         <li class="swiper-slide level2">
+                         {% if smart_category.image.name != '' %}
+                             <a href="{% url 'shopping:smart_object_detail' smart_category.slug %}">
+                                 <img src="{% get_media_prefix %}{{ smart_category.image.name }}" class="img-circle has-shade" style=""  alt="">
+                                 <span class="menu-label">{{ smart_category.title | truncatechars:10  }}</span>
+                             </a>
+                         </li>
+                         {% endif %}
+                         {% endfor %}
+                         {% for smart_category in smart_categories_level1 %}
+                         {% if smart_category.image.name != '' %}
+                         <li class="swiper-slide level1">
+                             <a href="{% url 'shopping:smart_object_detail' smart_category.slug %}">
+                                 <img src="{% get_media_prefix %}{{ smart_category.image.name }}" class="img-circle has-shade" style=""  alt="">
+                                 <span class="menu-label">{{ smart_category.title | truncatechars:10  }}</span>
+                             </a>
+                         </li>
+                         {% endif %}
+                         {% endfor %}
+                         {% for category in menu_categories %}
+                         {% if category.image.name != '' %}
+                         <li class="swiper-slide">
+                             <a href="{% url 'shopping:product_list' category.slug %}">
+                                 <img src="{% get_media_prefix %}{{ category.image.name }}" class="img-circle has-shade" style=""  alt="">
+                                 <span class="menu-label">{{ category.name | truncatechars:10 }}</span>
+                             </a>
+                         </li>
+                         {% endif %}
+                         {% endfor %}
+                         {% for category in menu_categories %}
+                         {% if category.image.name != '' %}
+                         <li class="swiper-slide">
+                             <a href="{% url 'shopping:product_list' category.slug %}">
+                                 <img src="{% get_media_prefix %}{{ category.image.name }}" class="img-circle has-shade" style=""  alt="">
+                                 <span class="menu-label">{{ category.name | truncatechars:10 }}</span>
+                             </a>
+                         </li>
+                         {% endif %}
+                         {% endfor %}
+                         {% for category in quick_access_categories %}
+                         {% if category.image.name != '' %}
+                         <li class="swiper-slide">
+                             <a href="{% url 'shopping:product_list' category.slug %}">
+                                 <img src="{% get_media_prefix %}{{ category.image.name }}" class="img-circle has-shade" style=""  alt="">
+                                 <span class="menu-label">{{ category.name | truncatechars:10 }}</span>
+                             </a>
+                         </li>
+                         {% endif %}
+                         {% endfor %}
+                    </ul>
+                {% if config.can_manage_currencies %}
+                    {% include 'shopping/snippets/currency_switcher.html' %}
+                {% endif %}
                 </div>
             </div>
             {% endblock horizontal_menu %}
@@ -379,6 +512,12 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         {% endblock cart_shopping %}
 
         {% block footer %}
+            {% if request.session.theme %}
+                <div>
+                    <a href="{% url 'theming:theme_list' %}?apply=yes">{% trans "Apply" %}</a>
+                </div>
+            {% endif %}
+
             {% cache template_cache_duration footer %}
             <div class="footer-w3l hidden-xs">
                 <div class="container">
@@ -442,6 +581,9 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                             - <a href="{{ settings.LEGAL_MENTIONS_URL }}" style="text-decoration: none">{% trans "Legal mentions" %}</a>
                         </p>
                     </div>
+                    <div class="push-right">
+                        {% include 'shopping/snippets/language_switcher.html' %}
+                    </div>
 {#                    <div class="copy-right">#}
 {#                        <img src="{% static 'kakocase/img/card.png' %}" alt=""/>#}
 {#                    </div>#}
@@ -450,7 +592,19 @@ License URL: http://creativecommons.org/licenses/by/3.0/
             </div>
             {% endcache %}
         {% endblock %}
-
+        {% if request.session.theme %}
+        <div class="apply-theme-band">
+            <div class="container-fluid">
+                <div class="col-sm-9">
+                   <p class="hidden-xs">{% trans 'If you like this theme, click Apply to use it.' %}</p>
+                   <p class="visible-xs">{% trans 'Do you like this theme ?' %}</p>
+                </div>
+                <div class="col-sm-3 col-lg-2 col-xs-12">
+                   <a class="btn btn-success btn-block" href="{% url 'theming:theme_list' %}?apply=yes">{% trans "Apply" %}</a>
+                </div>
+           </div>
+        </div>
+        {% endif %}
         {% include 'shopping/snippets/edge_panel.html' %}
         {% include 'shopping/snippets/modal_confirm_empty_cart.html' %}
         {% include 'shopping/snippets/modal_added_to_cart.html' %}
@@ -520,7 +674,6 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         $('.empty-cart.animated').toggleClass('hide fadeInUp fadeOutDown')
                     }
                 }
-
                 {% if request.GET.refer_now %}
                     let img = "{% static 'kakocase/img/refer-friends.svg' %}",
                     title = "{% blocktrans %}Select and send a product to your follower{% endblocktrans %}",
@@ -588,18 +741,18 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 });
 
                 $('body').on('click', '.value-plus1', function () {
-                    var max = $(this).data('max');
-                    var divUpd = $(this).parent().find('.value1'), newVal = parseInt(divUpd.text(), 10) + 1;
+                    let max = $(this).data('max');
+                    let divUpd = $(this).parent().find('.value1'), newVal = parseInt(divUpd.text(), 10) + 1;
                     if (newVal > max) {
                         ikwen.showFloatingNotice("{% trans "Available stock limit reached." %}", "", 3);
                         return;
                     }
                     divUpd.text(newVal);
                 }).on('click', '.value-minus1', function () {
-                    var divUpd = $(this).parent().find('.value1'), newVal = parseInt(divUpd.text(), 10) - 1;
+                    let divUpd = $(this).parent().find('.value1'), newVal = parseInt(divUpd.text(), 10) - 1;
                     if (newVal >= 1) divUpd.text(newVal);
                 }).on('change', '.size-list .item-size-selector', function () {
-                    var id =$('option:selected',this).data('id'),
+                    let id =$('option:selected',this).data('id'),
                         price =$('option:selected',this).data('retail_price'),
                         packingPrice =$('option:selected',this).data('packing_price'),
                         priceVerbose =$('option:selected',this).data('retail_price_verbose'),
@@ -628,6 +781,16 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     toggleTrash()
                 }).on('click', '.simpleCart_empty', function () {
                     $('.cart-shopping.animated').toggleClass('fadeInUp fadeOutDown')
+                }).on('click', '.toggle-cd-search .open', function () {
+                    $(this).hide();
+                    $('.toggle-cd-search .close2').show();
+                    $('.cd-search').addClass('reveal').show();
+                    $('.cd-search input').focus()
+                }).on('click', '.toggle-cd-search .close2', function () {
+                    $(this).hide();
+                    $('.toggle-cd-search .open').show();
+                    $('.cd-search').removeClass('reveal').show();
+                    $('.cd-search input').focus()
                 });
                 $('#content').on('click', '.product-tile button.my-cart-b:not(.sold-out)', function () {
                     let id = $(this).data('id'),
@@ -690,14 +853,14 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 //Check simpleCart_items : END
 
 
-                var headerTopH = $('.header-top').height(),
-                        headerBottomH = $('.header-bottom').height(),
-                        lastScrollTop = 0;
+                let headerTopH = $('.header-top').height(),
+                    headerBottomH = $('.header-bottom').height(),
+                    lastScrollTop = 0;
                 $(window).scroll(function (e) {
                     var scrollTop = $(this).scrollTop();
                     if (scrollTop > headerTopH + headerBottomH) {
                         $('.header-bottom:not(.fixed)').addClass('fixed').animate({top: 0});
-                        $('#auth').remove().prependTo('.header-right2')
+                        {#$('#auth').remove().prependTo('.header-right2')#}
                     } else {
                         $('.header-bottom.fixed').removeClass('fixed');
                         $('.toggle-cd-search').removeClass('is_active');
@@ -721,9 +884,21 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                     }
                 });
 
+                if(!ikwen.CookieUtil.get('hasPendingCoupon')){
+                    {% if coupon_summary.threshold_reached %}
+                        $('body').on('click', '.header-xs .navbar-toggle', (e) => {
+                            let expires = (new Date()).getTime() + 345600000;
+                                expires = new Date(expires);
+                                ikwen.CookieUtil.set('hasPendingCoupon', 'yes', expires);
+                                $('.coupons-notification').hide();
+                        });
+                    {% endif %}
+                }
+
+
                 $("#hide-email-modal").click(function(){
                     reInitTopComponent();
-                    var showEmailModal = $(this).val();
+                    let showEmailModal = $(this).val();
                     localStorage.removeItem('showEmailModal');
                     if (showEmailModal === 'on'){
                         localStorage.setItem('showEmailModal', true)
@@ -771,28 +946,13 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                         $('.edge-panel-left').addClass('has-shade').appendTo('.edge-swipe-overlay');
                     }
                 }));
-                var menuCount = $(".nav.navbar-nav li.horizontal").length,
+                let menuCount = $(".nav.navbar-nav li.horizontal").length,
                     subMenuCount = $(".categories-menu li.vertical").length;
                 if (subMenuCount >= menuCount) $(".dropdown.categories-menu").hide();
-                var ulWidth = $(".navbar-nav").width() + 20;
+                let ulWidth = $(".navbar-nav").width() + 20;
                 $(".nav-container .navbar-nav").css({float: 'none', margin: 'auto', width: ulWidth});
-                $('body').on('click', '.toggle-cd-search .open', function () {
-                    $(this).hide();
-                    $('.toggle-cd-search .close2').show();
-                    $('.cd-search').addClass('reveal').show();
-                    $('.cd-search input').focus()
-                }).on('click', '.toggle-cd-search .close2', function () {
-                    $(this).hide();
-                    $('.toggle-cd-search .open').show();
-                    $('.cd-search').removeClass('reveal').show();
-                    $('.cd-search input').focus()
-                });
-
 
                 function reInitTopComponent() {
-                    {#$('.header-xs .nav-xs').removeClass('appear');#}
-                    {#$('.header-xs .cd-search-trigger').removeClass('search-is-visible');#}
-                    {#$('.header-xs .cd-search').removeClass('is-visible');#}
                     $('.header-xs .action.dropdown').removeClass('open')
                 }
 
@@ -802,7 +962,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 $("a.action").click(function () {
                     if($(this).parent('.button-hover-handler').hasClass('active')){
                          $(this).parent('.button-hover-handler').removeClass('active');
-                    }else{
+                    } else {
                         $(".button-hover-handler").removeClass('active');
                         $(this).parent('.button-hover-handler').addClass('active');
                     }
@@ -813,26 +973,24 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 });
 
                 function ran_col() { //function name
-                    var color = '#'; // hexadecimal starting symbol
-                    var letters = ['004800','780015','752201','011899','8F0193','3F0008','00193D','0E1900','21003D']; //Set your colors here
+                    let color = '#'; // hexadecimal starting symbol
+                    let letters = ['004800','780015','752201','011899','8F0193','3F0008','00193D','0E1900','21003D']; //Set your colors here
                     color += letters[Math.floor(Math.random() * letters.length)];
                     $('#no-logo').css('background', color)
                 }
                 ran_col();
+                let mySwiper = new Swiper ('.xs-swiper-container', {
+                    // Optional parameters
+                    direction: 'horizontal',
+                    loop: true,
+                    spaceBetween: 10,
+                    slidePosition: 0,
+                    freeMode: true,
+                    centeredSlides: true,
+                    slidesPerView: 'auto',
+                })
             })()
 		</script>
-        <script>
-            let mySwiper = new Swiper ('.xs-swiper-container', {
-                // Optional parameters
-                direction: 'horizontal',
-                loop: true,
-                spaceBetween: 10,
-                slidePosition: 0,
-                freeMode: true,
-                centeredSlides: true,
-                slidesPerView: 'auto',
-            })
-        </script>
         {% block js %}{% endblock %}
     </body>
 </html>

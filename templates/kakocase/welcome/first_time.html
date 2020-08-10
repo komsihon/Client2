@@ -24,7 +24,7 @@
     <link rel="shortcut icon" type="image/png" href="{{ settings.IKWEN_MEDIA_URL }}{{ service.config.logo.name }}">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css" integrity="sha384-B4dIYHKNBt8Bc12p+WXckhzcICo0wtJAoU8YZTY5qE0Id1GSseTk6S+L3BlXeVIU" crossorigin="anonymous">
     <link rel='stylesheet' href="{% static 'ikwen/css/flatly.bootstrap.min.css' %}" />
-    <link rel='stylesheet' href="{% static 'kakocase/css/welcome/base.css' %}?v=20.8.6" />
+    <link rel='stylesheet' href="{% static 'kakocase/css/welcome/base.css' %}?v=20.08.08" />
     <link rel='stylesheet' href="{% static 'ikwen/swiper/css/swiper.min.css' %}" />
     <link rel="stylesheet" href="{% static 'kakocase/css/welcome/welcome.css' %}?v=20-06-04.19.21"/>
     <link rel="stylesheet" href="{% static 'ikwen/css/pwa.css' %}"/>
@@ -276,7 +276,9 @@
             $(window).on('resize', () => {
                 resize();
             });
-
+            {% if config.brand_color != '#ffffff' and config.brand_color != '#FFFFFF' and config.brand_color != '#fff' and config.brand_color != '#FFF' %}
+                $('.navbar-static-top.active').css('background-color', "{{ config.brand_color }}");
+            {% endif %}
         })()
     </script>
 {% endblock %}
