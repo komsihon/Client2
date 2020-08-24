@@ -27,16 +27,12 @@
     <link rel='stylesheet' href="{% static 'kakocase/css/welcome/base.css' %}?v=20.08.08" />
     <link rel='stylesheet' href="{% static 'ikwen/swiper/css/swiper.min.css' %}" />
     <link rel="stylesheet" href="{% static 'kakocase/css/welcome/welcome.css' %}?v=20-06-04.19.21"/>
+    <link rel="stylesheet" href="{% static 'kakocase/css/welcome/first-time.css' %}">
     <link rel="stylesheet" href="{% static 'ikwen/css/pwa.css' %}"/>
 
     <!--Conditional custom css -->
     <link rel="stylesheet" type="text/css" href="{% static 'kakocase/css/welcome/'%}other.css?v=20.8.6">
-    <link rel="stylesheet" type="text/css" href="{% static 'kakocase/css/welcome/'%}{{ business_category }}.css">
-    <style type="text/css">
-        #navbar, .navbar.active {background: #fff !important;}
-        .navbar .icon-bar, .navbar.active .icon-bar {background: #9a321b}
-        #navbar .glyphicon {color: #9a321b !important}
-    </style>
+    <link rel="stylesheet" type="text/css" href="{% static 'kakocase/css/welcome/'%}{{ business_category }}.css">x
 {% endblock %}
 
 {% block head_js %}
@@ -49,6 +45,16 @@
 {% block content %}
     <div id="content">
         <div  class="container">
+            <div class="anchor">
+                <a class="js-scrollTo" href="#banner-bottom" style="text-decoration: none; display: block">
+                    <div class="round">
+                        <div id="cta">
+                            <i class="arrow primera glyphicon glyphicon-menu-down"></i>
+                            <i class="arrow segunda glyphicon glyphicon-menu-down"></i>
+                        </div>
+                    </div>
+                </a>
+            </div>
             <div class="section row">
                 <div id="banner-img" class="col-md-4 col-sm-2 img-illustration">
                     <img class="main-img" src="{% static 'kakocase/img/welcome/about-service.jpg' %}">
@@ -225,7 +231,7 @@
                 <div class="clearfix"></div>
             </div>
             <div class="clearfix"></div>
-            <div class="banner-bottom">
+            <div id="banner-bottom" class="banner-bottom">
                 <div class="text-center" style="margin: auto">
                     <img class="start-now" src="{% static 'kakocase/img/start-now.png' %}">
                     <h2>{% trans 'You can start now !' %}</h2>
@@ -279,6 +285,16 @@
             {% if config.brand_color != '#ffffff' and config.brand_color != '#FFFFFF' and config.brand_color != '#fff' and config.brand_color != '#FFF' %}
                 $('.navbar-static-top.active').css('background-color', "{{ config.brand_color }}");
             {% endif %}
+            let scrollBreakPoint = 0.9;
+            $(window).scroll((event) => {
+                let scrollTop = $(window).scrollTop(),
+                    scrollTopPercent = (scrollTop)/($(document).height() - $(window).height());
+                if (scrollTopPercent >= scrollBreakPoint){
+                    $('.anchor').hide();
+                } else {
+                    $('.anchor').show();
+                }
+            });
         })()
     </script>
 {% endblock %}
