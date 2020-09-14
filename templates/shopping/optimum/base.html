@@ -47,7 +47,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
                 <link href="https://fonts.googleapis.com/css?family=Open+Sans:400,700,600,400italic,300" rel="stylesheet">
             {% endif %}
 		{% endblock %}
-        <link href="{% static 'tchopetyamo/css/yamo.css' %}?v=20.08.08" rel="stylesheet">
+        <link href="{% static 'tchopetyamo/css/yamo.css' %}?v=20.8.8" rel="stylesheet">
         <script>
             navigator.serviceWorker.getRegistrations().then(
                 function(registrations) {
@@ -591,7 +591,10 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         {% include 'shopping/snippets/modal_delivery_location_warning.html' %}
         <div id="pwa-overlay">
             <div class="text-has-shade text-center visible-xs visible-sm">
-                <h3 style="color: #fff; margin: 5vh 0; font-weight: 600">{% trans "Click the button below" %}</h3>
+                <p class="app">
+                    {% blocktrans %}Please, <strong>Add</strong> application to your home.{% endblocktrans %}</p>
+                <p class="push">
+                    {% blocktrans %}Please, click <strong>Authorize</strong> to receive order alerts and bonuses.{% endblocktrans %}</p>
                 <div>
                     <i class="fa fa-arrow-down" style="font-size: 27px"></i>
                 </div>
@@ -632,7 +635,7 @@ License URL: http://creativecommons.org/licenses/by/3.0/
         </div>
         {# modal END #}
         {% if service.is_pwa_ready %}
-            <script src="{% static 'ikwen/js/pwa-main.js' %}"></script>
+            <script src="{% static 'ikwen/js/pwa-main.js' %}?v=20.9.14"></script>
         {% endif %}
         <script src="{% static 'kakocase/js/bootstrap-3.1.1.min.js' %}"></script>
         <script src="{% static 'kakocase/js/simpleCart.min.js' %}"></script>
